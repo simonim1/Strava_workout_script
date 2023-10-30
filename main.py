@@ -1,6 +1,7 @@
 import requests
 import time
 import pickle
+from datetime import datetime, timedelta
 from stravalib.client import Client
 from flask import Flask, request, url_for, session, redirect, render_template
 
@@ -68,16 +69,19 @@ def get_user_page():
         return redirect("/")
 
     # so next step is to do after on this
-    activities = client.get_activities(after=)
+    last_week = datetime.today() - timedelta(days=7)
+    activities = client.get_activities(after=last_week)
 
+    activity_list= []
     for activity in activities:
         my_dict = activity.to_dict()
+        activity_list.append(my_dict)
         print(my_dict)
 
-    act = client.get_activity(9305059575)
-    temp = act.to_dict()
-    print(temp)
-    return temp
+    # act = client.get_activity(9305059575)
+    # temp = act.to_dict()
+    # print(temp)
+    return str(len(activity_list))
 
 
     ############################################
