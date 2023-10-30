@@ -78,16 +78,21 @@ def get_user_page():
         activity_list.append(my_dict)
         print(my_dict)
 
+    # sorting activities on date
+    activity_list.sort(key=lambda x: x['start_date_local'])
+
+    # TODO: add editing csv descriptions
+
     # act = client.get_activity(9305059575)
     # temp = act.to_dict()
     # print(temp)
     return str(len(activity_list))
 
 
-    ############################################
-    #                 helpers                  #
-    ############################################
-    # function to get the token info from the session
+############################################
+#                 helpers                  #
+############################################
+# function to get the token info from the session
 def get_token():
         token_info = session.get(TOKEN_INFO, None)
         if not token_info:
@@ -110,6 +115,5 @@ def create_strava_oath():
                              scope=['read_all', 'profile:read_all', 'activity:read_all','activity:write']
                              )
     return url
-
 
 app.run(debug=True)
