@@ -1,5 +1,6 @@
 import requests
 import time
+import csv
 import pickle
 from datetime import datetime, timedelta
 from stravalib.client import Client
@@ -69,7 +70,7 @@ def get_user_page():
         return redirect("/")
 
     # so next step is to do after on this
-    last_week = datetime.today() - timedelta(days=7)
+    last_week = datetime.today() - timedelta(days=8)
     activities = client.get_activities(after=last_week)
 
     activity_list= []
@@ -81,12 +82,33 @@ def get_user_page():
     # sorting activities on date
     activity_list.sort(key=lambda x: x['start_date_local'])
 
-    # TODO: add editing csv descriptions
+    routine_dict = prephase_csv_reader('workout_routines/Prephase_4_weeks.csv')
 
-    # act = client.get_activity(9305059575)
-    # temp = act.to_dict()
-    # print(temp)
-    return str(len(activity_list))
+    day = 0
+    variation_one = True
+    #TODO: make this more dynamic for my different varations
+    for activity in activity_list:
+        if activity['type'] == 'WeightTraining':
+            if variation_one:
+                print(activity['id'])
+                if day == 0:
+                    update_strava_activity('Upper 1', routine_dict,activity)
+
+                if day == 1:
+                    update_strava_activity('Lower 1',routine_dict,activity)
+
+                if day == 2:
+                    update_strava_activity('Upper 2', routine_dict, activity)
+
+                if day == 3:
+                    update_strava_activity('Lower 2', routine_dict, activity)
+
+                if day == 4:
+                    update_strava_activity('Upper 1', routine_dict, activity)
+
+                day += 1
+
+    return routine_dict
 
 
 ############################################
@@ -115,5 +137,41 @@ def create_strava_oath():
                              scope=['read_all', 'profile:read_all', 'activity:read_all','activity:write']
                              )
     return url
+
+def prephase_csv_reader(file_name):
+    with open(file_name, mode='r') as file:
+        # reading the CSV file
+        csvFile = csv.reader(file)
+
+        # displaying the contents of the CSV file
+        paragraph = " "
+        routine_dict = {}
+        for lines in csvFile:
+            if lines != []:
+                print(lines)
+                sententence = " ".join(lines) + '\n '
+                paragraph = paragraph + sententence
+            else:
+                if 'Upper 1' in paragraph:
+                    routine_dict['Upper 1'] = paragraph
+                    paragraph = " "
+                if 'Lower 1' in paragraph:
+                    routine_dict['Lower 1'] = paragraph
+                    paragraph = " "
+                if 'Upper 2' in paragraph:
+                    routine_dict['Upper 2'] = paragraph
+                    paragraph = " "
+
+            # last routine in the list so there doesnt need to be checking
+        routine_dict['Lower 2'] = paragraph
+        paragraph = " "
+        return routine_dict
+
+def update_strava_activity( routine_key, routine_dict,activity):
+    workout_title = routine_key
+    description = routine_dict[routine_key]
+    client.update_activity(activity['id'], name=workout_title, description=description)
+
+
 
 app.run(debug=True)
