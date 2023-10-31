@@ -39,3 +39,23 @@ python3 main.py
 This is a tool mostly to help writing descriptions better for each workout I did. Along with that though I wanted to show 
 Strava I am super interested in their company and used their api to make a tool. I use strava alot and would love to
 program for them one day. 
+
+### Assumptions with the work out routine
+I am doing a 5 day split in my work outs where it would go 
+```commandline
+upper 1
+lower 1
+upper 2
+lower 2
+upper 1
+```
+then the proceeding week will be 
+```commandline
+upper 2
+lower 1
+upper 1
+lower 2
+upper 2
+```
+the assumption is that I am following this routine and so with the sorted workouts I will check if its weight lifting then put in the changes if I am doing variation one or variation two. I will have this hard coded right now as I am short on time 
+but once fully planned out this will allow user input to say which variation of the week and soon it will have different csvs to choose from. 
