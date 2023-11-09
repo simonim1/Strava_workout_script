@@ -84,29 +84,9 @@ def get_user_page():
 
     routine_dict = prephase_csv_reader('workout_routines/Prephase_4_weeks.csv')
 
-    day = 0
-    variation_one = True
-    #TODO: make this more dynamic for my different varations
-    for activity in activity_list:
-        if activity['type'] == 'WeightTraining':
-            if variation_one:
-                print(activity['id'])
-                if day == 0:
-                    update_strava_activity('Upper 1', routine_dict,activity)
+    variation_one = False
+    variation_update(variation_one=variation_one, activity_list=activity_list, csv_routine_dict=routine_dict)
 
-                if day == 1:
-                    update_strava_activity('Lower 1',routine_dict,activity)
-
-                if day == 2:
-                    update_strava_activity('Upper 2', routine_dict, activity)
-
-                if day == 3:
-                    update_strava_activity('Lower 2', routine_dict, activity)
-
-                if day == 4:
-                    update_strava_activity('Upper 1', routine_dict, activity)
-
-                day += 1
 
     return routine_dict
 
@@ -166,6 +146,37 @@ def prephase_csv_reader(file_name):
         routine_dict['Lower 2'] = paragraph
         paragraph = " "
         return routine_dict
+
+def variation_update(variation_one=True, activity_list=[], csv_routine_dict={}):
+
+    if variation_one == False:
+        upper = 'Upper 1'
+    else:
+        upper = 'Upper 2'
+
+    day = 0
+    for activity in activity_list:
+        if activity['type'] == 'WeightTraining':
+            if variation_one:
+                print(activity['id'])
+                if day == 0:
+                    update_strava_activity(upper, csv_routine_dict,activity)
+
+                if day == 1:
+                    update_strava_activity('Lower 1',csv_routine_dict,activity)
+
+                if day == 2:
+                    update_strava_activity(upper, csv_routine_dict, activity)
+
+                if day == 3:
+                    update_strava_activity('Lower 2', csv_routine_dict, activity)
+
+                if day == 4:
+                    update_strava_activity(upper, csv_routine_dict, activity)
+
+                day += 1
+
+    return csv_routine_dict
 
 def update_strava_activity( routine_key, routine_dict,activity):
     workout_title = routine_key
