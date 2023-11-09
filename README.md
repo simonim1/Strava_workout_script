@@ -58,4 +58,15 @@ lower 2
 upper 2
 ```
 the assumption is that I am following this routine and so with the sorted workouts I will check if its weight lifting then put in the changes if I am doing variation one or variation two. I will have this hard coded right now as I am short on time 
-but once fully planned out this will allow user input to say which variation of the week and soon it will have different csvs to choose from. 
+but once fully planned out this will allow user input to say which variation of the week and soon it will have different csvs to choose from.
+
+
+### Possible bugs for strava devs
+When calling the api to update my weight training I did get this error . Though I got this error I still was able to update my work outs
+
+```commandline
+Unable to set attribute visibility on entity <Activity id=<id> name=None>
+
+```
+Along with this weird line I also would not get a response payload back from the api call but maybe that is limited to 
+the strava lib
