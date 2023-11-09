@@ -17,7 +17,7 @@ class Strava:
         '''
         :return: Return the oauth URL needed to login to strava application
         '''
-        url = self.client.authorization_url(client_id=CLIENT_ID,
+        url = self.strava_client.authorization_url(client_id=CLIENT_ID,
                                        redirect_uri=REDIRECT_URI,
                                        scope=SCOPE_LIST
                                        )
@@ -33,13 +33,12 @@ class Strava:
         try:
             workout_title = self.update_activity_name(activity,routine_key)
             description = self.update_description(activity,routine_dict[routine_key])
-
-            res = self.strava_client.update_activity(activity['id'], name=workout_title, description=description)
+            res = self.strava_client.update_activity(activity['id'], name=workout_title, description=description, )
+            return res
         except Exception as  e:
             print("error calling strava api")
             print(e)
 
-        return res.json()
 
     def update_activity_name(self,activity, routine_title):
         '''
@@ -48,8 +47,11 @@ class Strava:
         :return: some strava workouts when imported I change the title, in this case I want to append the work out day
         to the title else it can be rewritten
         '''
+
         if activity['name'] in DEFAULT_WEIGHTRAINING_TITLES:
             return routine_title
+        elif routine_title in activity['name']:
+            return activity['name']
         return activity['name'] + ' ' + routine_title
 
     def update_description(self,activity, description):
@@ -59,8 +61,11 @@ class Strava:
         :return:some strava workouts when imported I change the discription, in this case I want to append the work out description
         to the description else it can be rewritten
         '''
+
         if activity['description'] == None:
             return description
+        elif description in activity['description']:
+            return activity['description']
         return activity['description'] + '\n' + description
 
     def get_weight_traning_activities(self, after):
@@ -74,16 +79,17 @@ class Strava:
 
             for activity in activities:
                 my_dict = activity.to_dict()
-                if activity['type'] == 'WeightTraining':
+                if my_dict['type'] == 'WeightTraining':
                     weight_trainings_list.append(my_dict)
-
             # sorting activities on date
             weight_trainings_list.sort(key=lambda x: x['start_date_local'])
+
             return weight_trainings_list
 
         except Exception as e:
             print(" Error grabbing weight training activities ")
             print(e)
+
 
 
 
@@ -95,26 +101,30 @@ class Strava:
         :param csv_routine_dict: dictionary with
         :return: return the workout routing
         '''
-        if variation_one == False:
-            upper = 'Upper 1'
-        else:
-            upper = 'Upper 2'
 
-        day = 0
-        for activity in activity_list:
-            if activity['type'] == 'WeightTraining':
-                if variation_one:
-                    print(activity['id'])
+        try:
+            if variation_one == False:
+                upper = 'Upper 2'
+            else:
+                upper = 'Upper 1'
+
+            day = 0
+            for activity in activity_list:
+
+                if activity['type'] == 'WeightTraining':
                     if day == 0:
-                        self.update_strava_activity(upper, csv_routine_dict,activity)
-                    if day == 1:
-                        self.update_strava_activity('Lower 1',csv_routine_dict,activity)
-                    if day == 2:
-                        self.update_strava_activity(upper, csv_routine_dict, activity)
-                    if day == 3:
-                        self.update_strava_activity('Lower 2', csv_routine_dict, activity)
-                    if day == 4:
-                        self.update_strava_activity(upper, csv_routine_dict, activity)
+                        res = self.update_strava_activity(upper, csv_routine_dict,activity)
+                    elif day == 1:
+                        res = self.update_strava_activity('Lower 1',csv_routine_dict,activity)
+                    elif day == 2:
+                        res = self.update_strava_activity(upper, csv_routine_dict, activity)
+                    elif day == 3:
+                        res = self.update_strava_activity('Lower 2', csv_routine_dict, activity)
+                    elif day == 4:
+                        res = self.update_strava_activity(upper, csv_routine_dict, activity)
                     day += 1
 
-        return csv_routine_dict
+            return "successfully updated strava activities"
+        except Exception as  e:
+            print("failed to update event")
+            print(e)

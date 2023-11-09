@@ -47,9 +47,8 @@ def redirect_page():
     # clear the session
     session.clear()
     # get the authorization code from the request parameters
-    print('debug')
     code = request.args.get('code')
-    print(code)
+
     # exchange the authorization code for an access token and refresh token
     token_info = strava.strava_client.exchange_code_for_token(client_id=STRAVA_CLIENT_ID,
                                               client_secret=STRAVA_CLIENT_SECRET,
@@ -79,9 +78,9 @@ def get_user_page():
 
     variation_one = False
 
-    strava.csv_prefase_weight_training_update(variation_one,activity_list=activity_list,csv_routine_dict=routine_dict)
+    response = strava.csv_prefase_weight_training_update(variation_one,activity_list=activity_list,csv_routine_dict=routine_dict)
 
-    return routine_dict
+    return str(response)
 
 
 ############################################
@@ -114,7 +113,6 @@ def prephase_csv_reader(file_name):
         routine_dict = {}
         for lines in csvFile:
             if lines != []:
-                print(lines)
                 sententence = " ".join(lines) + '\n '
                 paragraph = paragraph + sententence
             else:
