@@ -39,7 +39,6 @@ class Strava:
             print("error calling strava api")
             print(e)
 
-
     def update_activity_name(self,activity, routine_title):
         '''
         :param activity: is an activity object from Strava
@@ -89,10 +88,6 @@ class Strava:
         except Exception as e:
             print(" Error grabbing weight training activities ")
             print(e)
-
-
-
-
 
     def csv_prefase_weight_training_update(self,variation_one=True, activity_list=[], csv_routine_dict={}):
         '''
