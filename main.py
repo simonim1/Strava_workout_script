@@ -7,7 +7,8 @@ from stravalib.client import Client
 from flask import Flask, request, url_for, session, redirect, render_template
 
 # internal imports
-from Secrets.secrets import CLIENT_SECRET, CLIENT_ID, CODE
+from Secrets.secrets import CLIENT_SECRET, CLIENT_ID
+from Classes.StravaHelper import Strava
 
 ############################################
 #                 Globals                  #
@@ -29,13 +30,13 @@ app.secret_key = STRAVA_CLIENT_SECRET
 # set the key for the token info in the session dictionary
 TOKEN_INFO = 'token_info'
 
-client = Client()
+strava = Strava()
 
 # route to handle logging in
 @app.route('/')
 def login():
-    # create a SpotifyOAuth instance and get the authorization URL
-    auth_url = create_strava_oath()
+    # create a StravaOAuth instance and get the authorization URL
+    auth_url = strava.create_strava_oath()
     # redirect the user to the authorization URL
     return redirect(auth_url)
 
@@ -50,7 +51,7 @@ def redirect_page():
     code = request.args.get('code')
     print(code)
     # exchange the authorization code for an access token and refresh token
-    token_info = client.exchange_code_for_token(client_id=STRAVA_CLIENT_ID,
+    token_info = strava.strava_client.exchange_code_for_token(client_id=STRAVA_CLIENT_ID,
                                               client_secret=STRAVA_CLIENT_SECRET,
                                               code=code)
     # save the token info in the session
@@ -69,24 +70,16 @@ def get_user_page():
         print('User not logged in')
         return redirect("/")
 
-    # so next step is to do after on this
+    # TODO: make last_week, varation and csv user input
     last_week = datetime.today() - timedelta(days=8)
-    activities = client.get_activities(after=last_week)
 
-    activity_list= []
-    for activity in activities:
-        my_dict = activity.to_dict()
-        activity_list.append(my_dict)
-        print(my_dict)
-
-    # sorting activities on date
-    activity_list.sort(key=lambda x: x['start_date_local'])
+    activity_list = strava.get_weight_traning_activities(after=last_week)
 
     routine_dict = prephase_csv_reader('workout_routines/Prephase_4_weeks.csv')
 
     variation_one = False
-    variation_update(variation_one=variation_one, activity_list=activity_list, csv_routine_dict=routine_dict)
 
+    strava.csv_prefase_weight_training_update(variation_one,activity_list=activity_list,csv_routine_dict=routine_dict)
 
     return routine_dict
 
@@ -106,17 +99,10 @@ def get_token():
 
         is_expired = token_info['expires_at'] - now < 60
         if (is_expired):
-            spotify_oauth = create_strava_oath()
-            token_info = spotify_oauth.refresh_access_token(token_info['refresh_token'])
+            strava_oauth = strava.create_strava_oath()
+            token_info = strava_oauth.refresh_access_token(token_info['refresh_token'])
 
         return token_info
-
-def create_strava_oath():
-    url = client.authorization_url(client_id=STRAVA_CLIENT_ID,
-                             redirect_uri='http://127.0.0.1:5000/authorization',
-                             scope=['read_all', 'profile:read_all', 'activity:read_all','activity:write']
-                             )
-    return url
 
 def prephase_csv_reader(file_name):
     with open(file_name, mode='r') as file:
@@ -147,41 +133,6 @@ def prephase_csv_reader(file_name):
         paragraph = " "
         return routine_dict
 
-def variation_update(variation_one=True, activity_list=[], csv_routine_dict={}):
-
-    if variation_one == False:
-        upper = 'Upper 1'
-    else:
-        upper = 'Upper 2'
-
-    day = 0
-    for activity in activity_list:
-        if activity['type'] == 'WeightTraining':
-            if variation_one:
-                print(activity['id'])
-                if day == 0:
-                    update_strava_activity(upper, csv_routine_dict,activity)
-
-                if day == 1:
-                    update_strava_activity('Lower 1',csv_routine_dict,activity)
-
-                if day == 2:
-                    update_strava_activity(upper, csv_routine_dict, activity)
-
-                if day == 3:
-                    update_strava_activity('Lower 2', csv_routine_dict, activity)
-
-                if day == 4:
-                    update_strava_activity(upper, csv_routine_dict, activity)
-
-                day += 1
-
-    return csv_routine_dict
-
-def update_strava_activity( routine_key, routine_dict,activity):
-    workout_title = routine_key
-    description = routine_dict[routine_key]
-    client.update_activity(activity['id'], name=workout_title, description=description)
 
 
 
