@@ -97,6 +97,7 @@ class Strava:
         :return: return the workout routing
         '''
 
+        # TODO: allow for the user to do how ever many weeks in advance and after 5 days it will change upper
         try:
             if variation_one == False:
                 upper = 'Upper 2'
