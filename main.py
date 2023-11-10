@@ -69,7 +69,7 @@ def get_user_page():
         if request.method == 'POST':
             form_data = request.form
             start_date = form_data['date']
-            variation_one = form_data['Variation']
+            variation_one = form_data['Variation'] == 'True'
 
         activity_list = strava.get_weight_traning_activities(after=start_date)
 
