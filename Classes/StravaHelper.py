@@ -101,8 +101,10 @@ class Strava:
         try:
             if variation_one == False:
                 upper = 'Upper 2'
+                next_upper = 'Upper 1'
             else:
                 upper = 'Upper 1'
+                next_upper = 'Upper 2'
 
             day = 0
             for activity in activity_list:
@@ -113,7 +115,7 @@ class Strava:
                     elif day == 1:
                         res = self.update_strava_activity('Lower 1',csv_routine_dict,activity)
                     elif day == 2:
-                        res = self.update_strava_activity(upper, csv_routine_dict, activity)
+                        res = self.update_strava_activity(next_upper, csv_routine_dict, activity)
                     elif day == 3:
                         res = self.update_strava_activity('Lower 2', csv_routine_dict, activity)
                     elif day == 4:
