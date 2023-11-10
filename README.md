@@ -74,7 +74,7 @@ the strava lib
 # Navigation
 the user will be directed to the user input page 
 
-![](./images/Screen Shot 2023-11-09 at 11.28.22 PM.png)
+![ScreenShotOne](./images/Screen Shot 2023-11-09 at 11.28.22 PM.png)
 
 
 the user then can choose which week variation they are doing with the dropdown.
@@ -82,4 +82,4 @@ Along with this the user will then pick the start date of the week with this dat
 
 After this all the WeightTraining activities will be updated and the user will then see the response the app gives
 
-![](./images/Screen Shot 2023-11-09 at 11.28.39 PM.png)
+![ScreenShotTwo](./images/Screen Shot 2023-11-09 at 11.28.39 PM.png)
