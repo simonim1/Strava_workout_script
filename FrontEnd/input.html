@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <body style="text-align: center;">
+        <h1 style="text-align: center; color: #fc4c02;">
+            Strava workout plan sync
+        </h1>
+        <form action="/user_activities" method = "POST">
+            <label style="text-align: center; color: black;">
+                Pick which variation you are on for this week:
+            </label>
+            <select name="Variation" id="variation">
+                  <option value="True">Variation 1</option>
+                  <option value="False">Variation 2</option>
+            </select>
+            <label for="date" style="display: block; margin-bottom: 10px;">
+
+                Enter the start date of the week
+                        (YYYY-MM-DD)
+            </label>
+            <input type="date" name="date" id="date"
+                   placeholder="YYYY-MM-DD" required
+                   style="padding: 5px; border-radius: 5px;
+                   border: 1px solid #ccc; margin-bottom: 10px;">
+                   <input type="submit" value="Submit"
+                    style="background-color: #fc4c02; color: White;
+                    padding: 10px 20px; border-radius: 5px;
+                    border: none; cursor: pointer;">
+        </form>
+    </body>
+</html>

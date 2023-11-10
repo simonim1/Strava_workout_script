@@ -1,9 +1,6 @@
-import requests
 import time
 import csv
-import pickle
-from datetime import datetime, timedelta
-from stravalib.client import Client
+
 from flask import Flask, request, url_for, session, redirect, render_template
 
 # internal imports
@@ -19,7 +16,7 @@ STRAVA_CLIENT_ID = CLIENT_ID
 ############################################
 #                 Flask                    #
 ############################################
-app = Flask(__name__)
+app = Flask(__name__,template_folder='FrontEnd')
 
 # set the name of the session cookie
 app.config['SESSION_COOKIE_NAME'] ='Strava cookie'
@@ -56,31 +53,37 @@ def redirect_page():
     # save the token info in the session
     session[TOKEN_INFO] = token_info
     # redirect the user to the save_discover_weekly route
-    return redirect(url_for('get_user_page',_external=True))
+    return redirect(url_for('get_user_input',_external=True))
 
+@app.route('/user_input')
+def get_user_input():
+    return render_template('input.html')
 
-@app.route('/user_activities')
+@app.route('/user_activities', methods = ['POST'])
 def get_user_page():
     try:
         # get the token info from the session
         token_info = get_token()
+
+        #grabbing user input
+        if request.method == 'POST':
+            form_data = request.form
+            start_date = form_data['date']
+            variation_one = form_data['Variation']
+
+        activity_list = strava.get_weight_traning_activities(after=start_date)
+
+        routine_dict = prephase_csv_reader('workout_routines/Prephase_4_weeks.csv')
+
+        response = strava.csv_prefase_weight_training_update(variation_one, activity_list=activity_list,
+                                                             csv_routine_dict=routine_dict)
     except:
         # if the token info is not found, redirect the user to the login route
         print('User not logged in')
         return redirect("/")
 
-    # TODO: make last_week, varation and csv user input
-    last_week = datetime.today() - timedelta(days=8)
 
-    activity_list = strava.get_weight_traning_activities(after=last_week)
-
-    routine_dict = prephase_csv_reader('workout_routines/Prephase_4_weeks.csv')
-
-    variation_one = False
-
-    response = strava.csv_prefase_weight_training_update(variation_one,activity_list=activity_list,csv_routine_dict=routine_dict)
-
-    return str(response)
+    return render_template('success.html', value = str(response))
 
 
 ############################################
