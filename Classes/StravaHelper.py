@@ -7,7 +7,7 @@ from stravalib.client import Client
 CONST_ACTIVTY = 'WeightTraining'
 REDIRECT_URI = 'http://127.0.0.1:5000/authorization'
 SCOPE_LIST = ['read_all', 'profile:read_all', 'activity:read_all', 'activity:write']
-DEFAULT_WEIGHTRAINING_TITLES = ['Morning Weight Training','Lunch Weight Training', 'Night Weight Training', 'Afternoon Weight Training']
+DEFAULT_WEIGHTRAINING_TITLES = ['Morning Weight Training','Lunch Weight Training', 'Night Weight Training', 'Afternoon Weight Training','Evening Weight Training']
 
 class Strava:
     def __init__(self):
@@ -47,9 +47,9 @@ class Strava:
         to the title else it can be rewritten
         '''
 
-        if activity['name'] in DEFAULT_WEIGHTRAINING_TITLES:
+        if activity['name'] in DEFAULT_WEIGHTRAINING_TITLES or 'Weight Training' in activity['name']:
             return routine_title
-        elif routine_title in activity['name']:
+        elif routine_title in activity['name']: # if we already updated this routine with the correct programming
             return activity['name']
         return activity['name'] + ' ' + routine_title
 
