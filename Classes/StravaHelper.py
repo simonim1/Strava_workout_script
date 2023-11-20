@@ -122,6 +122,10 @@ class Strava:
                         res = self.update_strava_activity(upper, csv_routine_dict, activity)
                     day += 1
 
+                    # TODO: what if a user has more than one week they want to do. we will have to do the logic to switch to the next week
+                    if day == 5:
+                        break
+
             return "successfully updated strava activities"
         except Exception as  e:
             print("failed to update event")
